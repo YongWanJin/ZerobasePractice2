@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import zerobase.Weather.WeatherApplication;
 import zerobase.Weather.domain.DateWeather;
 import zerobase.Weather.domain.Diary;
+import zerobase.Weather.error.InvalidDate;
 import zerobase.Weather.repository.DateWeatherRepository;
 import zerobase.Weather.repository.DiaryRepository;
 
@@ -50,7 +51,7 @@ public class DiaryService {
     // # 쓴 일기 저장
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void createDiary(LocalDate date, String text){
-        logger.info("Started to Create Diary");
+        logger.info("Method createDiary starts");
         // 1. DB에서 날씨데이터 가져오기
         DateWeather dateWeather = getDateWeather(date);
 
@@ -59,10 +60,11 @@ public class DiaryService {
         nowDiary.setDateWeather(dateWeather);
         nowDiary.setText(text);
         diaryRepository.save(nowDiary);
-        logger.info("Create Success");
+        logger.info("Method createDiary completes");
     }
 
     private DateWeather getDateWeather(LocalDate date){
+        logger.info("Method getDateWeather starts");
         List<DateWeather> dateWeatherListFromDB = dateWeatherRepository.findAllByDate(date);
         // 가져오고자하는 날짜의 날씨가 존재하지 않을때
         // api로부터 날씨 데이터를 새로 받아옴
@@ -82,8 +84,12 @@ public class DiaryService {
 
     // # 하루치 일기 조회
     @Transactional(readOnly = true)
-    public List<Diary> readDiary(LocalDate date)    {
-        logger.debug("readDiary start");
+    public List<Diary> readDiary(LocalDate date) {
+//        if(date.isAfter(LocalDate.ofYearDay(2999, 1)) || date.isBefore(LocalDate.ofYearDay(1900, 1))){
+//            throw new InvalidDate();
+//            // 그러나 이런식으로 일일히 예외처리를 하기에는 코드 가독성이 떨어진다.
+//            // 코드가 너무 길어짐.
+//        }
         return diaryRepository.findAllByDate(date);
     }
 
@@ -122,7 +128,7 @@ public class DiaryService {
     @Transactional
     @Scheduled(cron = "0 0 1 * * *")
     public void saveWeatherDate(){
-        logger.info("날씨 데이터 잘 가져옴!");
+        logger.info("method saveWeatherDate completes");
         dateWeatherRepository.save(getWeatherFromApi());
     }
 
@@ -138,12 +144,14 @@ public class DiaryService {
         dateWeather.setWeather(parsedWeather.get("weather").toString());
         dateWeather.setIcon(parsedWeather.get("icon").toString());
         dateWeather.setTemperature((Double) parsedWeather.get("temp"));
+        logger.info("method getWeatherFromApi completes");
         return dateWeather;
     }
 
     // # API에 요청 보내고 응답 받기
     private String getWheatherString(){
         String apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=seoul&appid=" + apiKey;
+        logger.info("method getWheatherString starts");
         try{
             // url을 http 형태로 연결시킴
             URL url = new URL(apiUrl);
@@ -165,6 +173,7 @@ public class DiaryService {
                 response.append(inputLine);
             }
             br.close();
+            logger.info("method getWheatherString completes");
             return response.toString();
 
         } catch (Exception e){
@@ -176,6 +185,7 @@ public class DiaryService {
     private Map<String, Object> parseWeather(String jsonString){
         JSONParser jsonParser = new JSONParser(); // json.simple패키지로 가져오기
         JSONObject jsonObject;
+        logger.info("method parseWeather starts");
 
         // String 객체를 JSONObject타입 객체로 변환
         try{
@@ -193,6 +203,7 @@ public class DiaryService {
         JSONObject weatherData = (JSONObject) jsonArray.get(0);
         resultMap.put("weather", weatherData.get("main"));
         resultMap.put("icon", weatherData.get("icon"));
+        logger.info("method parseWeather completes");
         return resultMap;
     }
 }

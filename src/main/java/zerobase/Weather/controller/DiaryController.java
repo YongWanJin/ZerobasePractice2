@@ -1,12 +1,16 @@
 package zerobase.Weather.controller;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import zerobase.Weather.domain.Diary;
+import zerobase.Weather.error.InvalidDate;
 import zerobase.Weather.service.DiaryService;
 
 import java.time.LocalDate;
 import java.util.List;
+
 
 // ### Controller : Client와 직접 상호작용하는 부분.
 // 무슨 정보를 제공해줄 것인가? 무슨 기능을 사용할 수 있도록 할 것인가?
@@ -66,6 +70,14 @@ public class DiaryController {
     ){
         diaryService.deleteDiary(date);
     }
+
+    // # 예외 처리
+    // (DiaryController라는 클래스에서 발생하는 모든 예외를 처리해준다.)
+//    @ExceptionHandler(InvalidDate.class)
+//    ResponseEntity<ErrorResponse> handleLineException(
+//            final InvalidDate.class error){
+//    }
+    // 이 방법으로는 컴파일 에러 발생. ControllerAdvice 방법 사용할 것.
 
 
 
