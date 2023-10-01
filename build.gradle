@@ -25,10 +25,25 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'com.googlecode.json-simple:json-simple:1.1.1' // json 파싱용
+
+	// json 파싱용
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+	// swagger (API document용)
+//	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+//	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+	// springboot 3.0 버전에 호환되는 최신 swagger 라이브러리를 사용
+	// (springfox -> springdoc)
+
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// 코드 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// mysql 연결용
 	runtimeOnly 'com.mysql:mysql-connector-j'
 }
 
